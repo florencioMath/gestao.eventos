@@ -1,0 +1,10 @@
+import type { RouteObject } from 'react-router-dom';
+import { <%= pageName %>Page } from './page';
+
+export const <%= pageNameLower %>Path = '<%= routePath %>';
+export const <%= pageNameLower %>Route: RouteObject = {
+	path: <%= pageNameLower %>Path,
+	element: <<%= pageName %>Page />,
+};
+
+

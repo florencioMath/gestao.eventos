@@ -1,0 +1,53 @@
+import { <%= apiType %> } from '@/lib/api';
+
+/**
+ * Serviço da feature <%= featureName %>
+ *
+ * Centraliza todas as chamadas de API relacionadas a <%= featureName %>.
+ *
+ * @example
+ * ```ts
+ * const data = await <%= FeatureName %>Service.list();
+ * ```
+ */
+export class <%= FeatureName %>Service {
+	/**
+	 * Listar todos os registros
+	 */
+	static async list() {
+		const response = await <%= apiType %>.get('<%= apiPath %>');
+		return response.data;
+	}
+
+	/**
+	 * Buscar um registro por ID
+	 */
+	static async getById(id: string | number) {
+		const response = await <%= apiType %>.get(`<%= apiPath %>/${id}`);
+		return response.data;
+	}
+
+	/**
+	 * Criar um novo registro
+	 */
+	static async create(data: unknown) {
+		const response = await <%= apiType %>.post('<%= apiPath %>', data);
+		return response.data;
+	}
+
+	/**
+	 * Atualizar um registro existente
+	 */
+	static async update(id: string | number, data: unknown) {
+		const response = await <%= apiType %>.put(`<%= apiPath %>/${id}`, data);
+		return response.data;
+	}
+
+	/**
+	 * Deletar um registro
+	 */
+	static async delete(id: string | number) {
+		const response = await <%= apiType %>.delete(`<%= apiPath %>/${id}`);
+		return response.data;
+	}
+}

@@ -1,0 +1,56 @@
+import type { <%= FeatureName %> } from '../types';
+
+interface <%= FeatureName %>CardProps {
+	data: <%= FeatureName %>;
+	onEdit?: (id: string | number) => void;
+	onDelete?: (id: string | number) => void;
+}
+
+/**
+ * Componente de card para exibir <%= featureName %>
+ *
+ * @example
+ * ```tsx
+ * <<%= FeatureName %>Card
+ *   data={item}
+ *   onEdit={handleEdit}
+ *   onDelete={handleDelete}
+ * />
+ * ```
+ */
+export const <%= FeatureName %>Card = ({ data, onEdit, onDelete }: <%= FeatureName %>CardProps) => {
+	return (
+		<div className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+			<h3 className="text-lg font-semibold mb-2">Item #{data.id}</h3>
+
+			{/* Adicione aqui os campos do seu modelo */}
+			<div className="space-y-2">
+				<p className="text-sm text-muted-foreground">
+					Personalize este componente de acordo com seus dados
+				</p>
+			</div>
+
+			{/* Ações */}
+			{(onEdit || onDelete) && (
+				<div className="flex gap-2 mt-4">
+					{onEdit && (
+						<button
+							onClick={() => onEdit(data.id)}
+							className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90"
+						>
+							Editar
+						</button>
+					)}
+					{onDelete && (
+						<button
+							onClick={() => onDelete(data.id)}
+							className="px-3 py-1 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/90"
+						>
+							Deletar
+						</button>
+					)}
+				</div>
+			)}
+		</div>
+	);
+};

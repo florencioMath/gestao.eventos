@@ -1,0 +1,7 @@
+import { <%= featureName %>Routes } from './routes/routes';
+
+export { <%= featureName %>Routes };
+export { <%= FeatureName %>Service } from './api/service';
+export type * from './types';
+
+

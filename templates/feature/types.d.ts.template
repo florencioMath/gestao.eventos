@@ -1,0 +1,37 @@
+/**
+ * Tipos da feature <%= featureName %>
+ */
+
+/**
+ * Representa um item de <%= featureName %>
+ */
+export type <%= FeatureName %> = {
+	id: string | number;
+	// Adicione aqui os campos do seu modelo
+	createdAt?: string;
+	updatedAt?: string;
+};
+
+/**
+ * Dados para criar um novo <%= featureName %>
+ */
+export type Create<%= FeatureName %>Request = {
+	// Adicione aqui os campos necessários para criação
+};
+
+/**
+ * Dados para atualizar um <%= featureName %>
+ */
+export type Update<%= FeatureName %>Request = {
+	// Adicione aqui os campos que podem ser atualizados
+};
+
+/**
+ * Resposta da API ao listar <%= featureName %>
+ */
+export type List<%= FeatureName %>Response = {
+	data: <%= FeatureName %>[];
+	total?: number;
+	page?: number;
+	pageSize?: number;
+};

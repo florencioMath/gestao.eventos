@@ -1,0 +1,13 @@
+import type { RouteObject } from 'react-router-dom';
+import { ClaimGuard } from '@/components/claim-guard';
+import { <%= pageName %>Page } from './page';
+
+export const <%= pageNameLower %>Path = '<%= routePath %>';
+export const <%= pageNameLower %>Route: RouteObject = {
+	path: <%= pageNameLower %>Path,
+	element: (
+		<ClaimGuard claim='<%= claimName %>'>
+			<<%= pageName %>Page />
+		</ClaimGuard>
+	),
+};

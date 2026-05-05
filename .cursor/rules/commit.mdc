@@ -1,0 +1,22 @@
+---
+alwaysApply: true
+---
+
+# Commit messages (Conventional Commits + PT-BR)
+
+Sempre gere mensagens de commit no formato:
+<type>(<scope>): <descrição em pt-br>
+
+Regras:
+
+- type SEMPRE em inglês: feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert
+- scope opcional e curto (ex: auth, api, ui, ci, db)
+- descrição em pt-br, minúscula, no imperativo: "adicionar", "corrigir", "remover", "atualizar"
+- não use ponto final no subject
+- se tiver breaking change, adicione "!" após type/scope (ex: feat!: ...) e inclua rodapé "BREAKING CHANGE: ..."
+
+Exemplos válidos:
+
+- feat(auth): adicionar login com Google
+- fix(api): corrigir validação do token
+- refactor(ui): simplificar componente de lista
