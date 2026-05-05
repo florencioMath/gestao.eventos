@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
 	const proxyTarget = env.VITE_PROXY_TARGET || 'http://localhost:8080';
 
 	return {
+		base: '/gestao.eventos/',
 		plugins: [react(), tailwindcss()],
 		resolve: {
 			alias: {
