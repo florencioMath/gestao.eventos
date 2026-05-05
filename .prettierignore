@@ -1,0 +1,24 @@
+# Dependências
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+build/
+.vite/
+*.local
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Cache
+.eslintcache
+
+# Logs
+*.log
+
+# Outros
+.DS_Store
+*.min.js
+*.min.css

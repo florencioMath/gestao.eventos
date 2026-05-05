@@ -1,0 +1,22 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Configurações padrão para todos os arquivos
+[*]
+indent_style = tab
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 100
+
+# Markdown preserva trailing whitespace para line breaks
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefiles usam tabs
+[Makefile]
+indent_style = tab
