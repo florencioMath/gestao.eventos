@@ -10,40 +10,48 @@ import { eventosRoutes } from '@/features/eventos';
 import { segurancaRoutes } from '@/features/seguranca';
 // [generate:import]
 
-export const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <HomeRedirect />,
-	},
+// Reaproveita o `base` do Vite para casar com o prefixo do GitHub Pages
+// Em dev BASE_URL = '/' (vira '' apos remover a barra final, sem efeito);
+// em producao vira '/gestao.eventos'.
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-	// Rotas públicas (não requerem autenticação)
-	{
-		element: <PublicLayout />,
-		errorElement: <RouteErrorBoundary />,
-		children: [
-			...authRoutes,
-			// [generate:public-route]
-		],
-	},
+export const router = createBrowserRouter(
+	[
+		{
+			path: '/',
+			element: <HomeRedirect />,
+		},
 
-	// Rotas privadas (requerem autenticação)
-	{
-		element: (
-			<PrivateGuard>
-				<PrivateLayout />
-			</PrivateGuard>
-		),
-		errorElement: <RouteErrorBoundary />,
-		children: [
-			...eventosRoutes,
-			...segurancaRoutes,
-			// [generate:private-route]
-		],
-	},
+		// Rotas públicas (não requerem autenticação)
+		{
+			element: <PublicLayout />,
+			errorElement: <RouteErrorBoundary />,
+			children: [
+				...authRoutes,
+				// [generate:public-route]
+			],
+		},
 
-	// Rota 404 - redireciona para home
-	{
-		path: '*',
-		element: <Navigate to='/entrar' replace />,
-	},
-]);
+		// Rotas privadas (requerem autenticação)
+		{
+			element: (
+				<PrivateGuard>
+					<PrivateLayout />
+				</PrivateGuard>
+			),
+			errorElement: <RouteErrorBoundary />,
+			children: [
+				...eventosRoutes,
+				...segurancaRoutes,
+				// [generate:private-route]
+			],
+		},
+
+		// Rota 404 - redireciona para home
+		{
+			path: '*',
+			element: <Navigate to='/entrar' replace />,
+		},
+	],
+	{ basename }
+);

@@ -104,7 +104,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 								Tentar novamente
 							</Button>
 							<Button
-								onClick={() => (window.location.href = '/')}
+								onClick={() => (window.location.href = import.meta.env.BASE_URL)}
 								className='px-6 py-2.5 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors'>
 								Voltar para home
 							</Button>
