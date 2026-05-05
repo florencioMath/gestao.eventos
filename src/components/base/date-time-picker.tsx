@@ -1,38 +1,18 @@
 import { cn } from '@/lib/utils';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import {
+	DIAS_SEMANA_CURTOS,
+	ITEM_ALTURA_ROLO,
+	MESES_PT,
+	obterDiasDoMes,
+	pad2,
+} from './calendario-pt-shared';
 import { Button } from './button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './dialog';
 
-const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-const MESES = [
-	'Janeiro',
-	'Fevereiro',
-	'Março',
-	'Abril',
-	'Maio',
-	'Junho',
-	'Julho',
-	'Agosto',
-	'Setembro',
-	'Outubro',
-	'Novembro',
-	'Dezembro',
-];
-
-const ITEM_HEIGHT = 36;
 const HORAS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTOS = Array.from({ length: 60 }, (_, i) => i);
-
-function getDiasDoMes(ano: number, mes: number): (number | null)[] {
-	const primeiroDia = new Date(ano, mes, 1).getDay();
-	const totalDias = new Date(ano, mes + 1, 0).getDate();
-	const dias: (number | null)[] = Array(primeiroDia).fill(null);
-	for (let i = 1; i <= totalDias; i++) dias.push(i);
-	return dias;
-}
-
-const pad = (n: number) => String(n).padStart(2, '0');
 
 type Props = {
 	value: string;
@@ -100,14 +80,14 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 		if (horaSelecionada > now.getHours()) {
 			setHoraSelecionada(now.getHours());
 			horaScrollRef.current?.scrollTo({
-				top: now.getHours() * ITEM_HEIGHT,
+				top: now.getHours() * ITEM_ALTURA_ROLO,
 				behavior: 'smooth',
 			});
 		}
 		if (horaSelecionada >= now.getHours() && minutoSelecionado > now.getMinutes()) {
 			setMinutoSelecionado(now.getMinutes());
 			minutoScrollRef.current?.scrollTo({
-				top: now.getMinutes() * ITEM_HEIGHT,
+				top: now.getMinutes() * ITEM_ALTURA_ROLO,
 				behavior: 'smooth',
 			});
 		}
@@ -128,11 +108,11 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 		if (!modalAberto) return;
 		const timer = setTimeout(() => {
 			horaScrollRef.current?.scrollTo({
-				top: horaSelecionada * ITEM_HEIGHT,
+				top: horaSelecionada * ITEM_ALTURA_ROLO,
 				behavior: 'instant',
 			});
 			minutoScrollRef.current?.scrollTo({
-				top: minutoSelecionado * ITEM_HEIGHT,
+				top: minutoSelecionado * ITEM_ALTURA_ROLO,
 				behavior: 'instant',
 			});
 		}, 80);
@@ -166,11 +146,11 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 		setHoraSelecionada(agora.getHours());
 		setMinutoSelecionado(agora.getMinutes());
 		horaScrollRef.current?.scrollTo({
-			top: agora.getHours() * ITEM_HEIGHT,
+			top: agora.getHours() * ITEM_ALTURA_ROLO,
 			behavior: 'smooth',
 		});
 		minutoScrollRef.current?.scrollTo({
-			top: agora.getMinutes() * ITEM_HEIGHT,
+			top: agora.getMinutes() * ITEM_ALTURA_ROLO,
 			behavior: 'smooth',
 		});
 	};
@@ -207,13 +187,13 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 	const scrollParaHora = (h: number) => {
 		if (isHoraFutura(h)) return; // Bloqueia hora futura
 		setHoraSelecionada(h);
-		horaScrollRef.current?.scrollTo({ top: h * ITEM_HEIGHT, behavior: 'smooth' });
+		horaScrollRef.current?.scrollTo({ top: h * ITEM_ALTURA_ROLO, behavior: 'smooth' });
 	};
 
 	const scrollParaMinuto = (m: number) => {
 		if (isMinutoFuturo(m)) return; // Bloqueia minuto futuro
 		setMinutoSelecionado(m);
-		minutoScrollRef.current?.scrollTo({ top: m * ITEM_HEIGHT, behavior: 'smooth' });
+		minutoScrollRef.current?.scrollTo({ top: m * ITEM_ALTURA_ROLO, behavior: 'smooth' });
 	};
 
 	const selecionarDia = (dia: number) => {
@@ -229,10 +209,11 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 				year: 'numeric',
 				hour: '2-digit',
 				minute: '2-digit',
+				hour12: false,
 			})
 		: '';
 
-	const dias = getDiasDoMes(anoSelecionado, mesSelecionado);
+	const dias = obterDiasDoMes(anoSelecionado, mesSelecionado);
 	const isProximoMesBloqueado = isMesFuturo(
 		mesSelecionado === 11 ? anoSelecionado + 1 : anoSelecionado,
 		mesSelecionado === 11 ? 0 : mesSelecionado + 1
@@ -280,7 +261,7 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 									<ChevronLeft className='h-4 w-4' />
 								</button>
 								<span className='text-sm font-semibold'>
-									{MESES[mesSelecionado]} {anoSelecionado}
+									{MESES_PT[mesSelecionado]} {anoSelecionado}
 								</span>
 								<button
 									type='button'
@@ -297,7 +278,7 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 							</div>
 
 							<div className='grid grid-cols-7 mb-1'>
-								{DIAS_SEMANA.map((d) => (
+								{DIAS_SEMANA_CURTOS.map((d) => (
 									<span
 										key={d}
 										className='text-center text-[10px] font-semibold text-muted-foreground py-0.5'>
@@ -351,26 +332,26 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 						{/* Seletor de hora e minuto */}
 						<div className='flex gap-1 items-center shrink-0'>
 							{/* Horas */}
-							<div className='relative w-10 h-45 overflow-hidden'>
+							<div className='relative h-44 w-10 overflow-hidden'>
 								<div
 									ref={horaScrollRef}
 									className='h-full overflow-y-scroll scroll-smooth'
 									style={{ scrollSnapType: 'y mandatory' }}
 									onScroll={(e) => {
 										const index = Math.round(
-											e.currentTarget.scrollTop / ITEM_HEIGHT
+											e.currentTarget.scrollTop / ITEM_ALTURA_ROLO
 										);
 										const h = Math.min(23, Math.max(0, index));
 										if (!isHoraFutura(h)) setHoraSelecionada(h);
 									}}>
-									<div style={{ height: ITEM_HEIGHT * 2.5 }} />
+									<div style={{ height: ITEM_ALTURA_ROLO * 2.5 }} />
 									{HORAS.map((h) => {
 										const bloqueado = isHoraFutura(h);
 										return (
 											<div
 												key={h}
 												style={{
-													height: ITEM_HEIGHT,
+													height: ITEM_ALTURA_ROLO,
 													scrollSnapAlign: 'center',
 												}}
 												className='flex items-center justify-center'>
@@ -386,19 +367,19 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 																? 'text-muted-foreground/25 cursor-not-allowed'
 																: 'text-muted-foreground hover:text-foreground'
 													)}>
-													{pad(h)}
+													{pad2(h)}
 												</button>
 											</div>
 										);
 									})}
-									<div style={{ height: ITEM_HEIGHT * 2.5 }} />
+									<div style={{ height: ITEM_ALTURA_ROLO * 2.5 }} />
 								</div>
 								<div
 									className='pointer-events-none absolute left-0 right-0 border-y border-primary'
 									style={{
 										top: '50%',
-										marginTop: -ITEM_HEIGHT / 2,
-										height: ITEM_HEIGHT,
+										marginTop: -ITEM_ALTURA_ROLO / 2,
+										height: ITEM_ALTURA_ROLO,
 									}}
 								/>
 							</div>
@@ -406,26 +387,26 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 							<span className='text-base font-bold text-foreground'>:</span>
 
 							{/* Minutos */}
-							<div className='relative w-10 h-45 overflow-hidden'>
+							<div className='relative h-44 w-10 overflow-hidden'>
 								<div
 									ref={minutoScrollRef}
 									className='h-full overflow-y-scroll scroll-smooth'
 									style={{ scrollSnapType: 'y mandatory' }}
 									onScroll={(e) => {
 										const index = Math.round(
-											e.currentTarget.scrollTop / ITEM_HEIGHT
+											e.currentTarget.scrollTop / ITEM_ALTURA_ROLO
 										);
 										const m = Math.min(59, Math.max(0, index));
 										if (!isMinutoFuturo(m)) setMinutoSelecionado(m);
 									}}>
-									<div style={{ height: ITEM_HEIGHT * 2.5 }} />
+									<div style={{ height: ITEM_ALTURA_ROLO * 2.5 }} />
 									{MINUTOS.map((m) => {
 										const bloqueado = isMinutoFuturo(m);
 										return (
 											<div
 												key={m}
 												style={{
-													height: ITEM_HEIGHT,
+													height: ITEM_ALTURA_ROLO,
 													scrollSnapAlign: 'center',
 												}}
 												className='flex items-center justify-center'>
@@ -441,19 +422,19 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 																? 'text-muted-foreground/25 cursor-not-allowed'
 																: 'text-muted-foreground hover:text-foreground'
 													)}>
-													{pad(m)}
+													{pad2(m)}
 												</button>
 											</div>
 										);
 									})}
-									<div style={{ height: ITEM_HEIGHT * 2.5 }} />
+									<div style={{ height: ITEM_ALTURA_ROLO * 2.5 }} />
 								</div>
 								<div
 									className='pointer-events-none absolute left-0 right-0 border-y border-primary'
 									style={{
 										top: '50%',
-										marginTop: -ITEM_HEIGHT / 2,
-										height: ITEM_HEIGHT,
+										marginTop: -ITEM_ALTURA_ROLO / 2,
+										height: ITEM_ALTURA_ROLO,
 									}}
 								/>
 							</div>
@@ -463,8 +444,8 @@ export function DateTimePicker({ value, onChange, label = 'Data da Remoção', r
 					{/* Preview */}
 					<div className='flex items-center justify-between rounded-md border px-3 py-2 mt-1 text-sm text-muted-foreground'>
 						<span>
-							{pad(diaSelecionado)}/{pad(mesSelecionado + 1)}/{anoSelecionado}{' '}
-							{pad(horaSelecionada)}:{pad(minutoSelecionado)}
+							{pad2(diaSelecionado)}/{pad2(mesSelecionado + 1)}/{anoSelecionado}{' '}
+							{pad2(horaSelecionada)}:{pad2(minutoSelecionado)}
 						</span>
 						<Calendar className='h-4 w-4' />
 					</div>

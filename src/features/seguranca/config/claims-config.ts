@@ -1,4 +1,13 @@
-import { Blocks, LayoutDashboard, ListTodo, Settings, User, Users } from 'lucide-react';
+import {
+	Blocks,
+	FileSpreadsheet,
+	LayoutDashboard,
+	ListTodo,
+	MapPin,
+	Settings,
+	User,
+	Users,
+} from 'lucide-react';
 
 export const claimsConfig: ClaimGroup[] = [
 	{
@@ -25,6 +34,23 @@ export const claimsConfig: ClaimGroup[] = [
 					{ value: 'eventos.edit', label: 'Editar' },
 					{ value: 'eventos.delete', label: 'Excluir' },
 				],
+			},
+			{
+				key: 'local-troca',
+				label: 'Local de troca',
+				icon: MapPin,
+				claims: [
+					{ value: 'local-troca.view', label: 'Visualizar' },
+					{ value: 'local-troca.create', label: 'Cadastrar' },
+					{ value: 'local-troca.edit', label: 'Editar' },
+					{ value: 'local-troca.delete', label: 'Excluir' },
+				],
+			},
+			{
+				key: 'relatorios-eventos',
+				label: 'Relatórios',
+				icon: FileSpreadsheet,
+				claims: [{ value: 'relatorios-eventos.view', label: 'Visualizar' }],
 			},
 		],
 	},

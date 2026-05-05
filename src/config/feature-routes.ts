@@ -1,5 +1,7 @@
 const ROTAS_POR_FEATURE: Record<string, string> = {
 	eventos: '/eventos',
+	'local-troca': '/eventos/locais-troca',
+	'relatorios-eventos': '/eventos/relatorios',
 	'cadastro-usuario': '/seguranca/usuarios',
 	'perfil-acesso': '/seguranca/perfis',
 	funcionalidades: '/seguranca/funcionalidades',
@@ -20,6 +22,20 @@ export function resolverCaminhoDaFeature(nomeGrupo: string, chaveFeature: string
 
 /** @deprecated Use resolverCaminhoDaFeature */
 export const resolveFeaturePath = resolverCaminhoDaFeature;
+
+/**
+ * Destaque do item no menu lateral. O `NavLink` padrão trata `/eventos` como prefixo de
+ * `/eventos/relatorios`, deixando "Eventos" e "Relatórios" ativos ao mesmo tempo.
+ */
+export function menuLateralItemAtivo(pathname: string, destino: string): boolean {
+	if (destino === '/eventos') {
+		return pathname === '/eventos' || pathname.startsWith('/eventos/novo');
+	}
+	if (destino === '/eventos/locais-troca') {
+		return pathname === '/eventos/locais-troca' || pathname.startsWith('/eventos/locais-troca/');
+	}
+	return pathname === destino || pathname.startsWith(`${destino}/`);
+}
 
 export function resolverRotaInicial(funcionalidades: GrupoFuncionalidade[]): string {
 	for (const grupo of funcionalidades) {

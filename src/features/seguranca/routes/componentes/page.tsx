@@ -56,10 +56,10 @@ export function ComponentesSegurancaPage() {
 			},
 			{
 				id: 'ex-url',
-				nome: 'logo-ici.png',
+				nome: 'logo-osasco.png',
 				tipoMime: 'image/png',
 				tamanhoBytes: undefined,
-				url: `${typeof window !== 'undefined' ? window.location.origin : ''}/logo-ici.png`,
+				url: `${typeof window !== 'undefined' ? window.location.origin : ''}/logo-osasco.png`,
 			},
 		],
 		[]

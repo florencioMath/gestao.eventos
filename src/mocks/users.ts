@@ -30,6 +30,13 @@ const claimEventosCompleto = [
 	{ id: 'e4', value: 'eventos.delete', label: 'Excluir' },
 ] as const;
 
+const claimLocalTrocaCompleto = [
+	{ id: 'lt1', value: 'local-troca.view', label: 'Visualizar' },
+	{ id: 'lt2', value: 'local-troca.create', label: 'Cadastrar' },
+	{ id: 'lt3', value: 'local-troca.edit', label: 'Editar' },
+	{ id: 'lt4', value: 'local-troca.delete', label: 'Excluir' },
+] as const;
+
 const claimSegurancaUsuario = [
 	{ id: 'u1', value: 'cadastro-usuario.view', label: 'Visualizar' },
 	{ id: 'u2', value: 'cadastro-usuario.create', label: 'Cadastrar' },
@@ -70,6 +77,18 @@ const grupoEventosAdmin: GrupoFuncionalidade = {
 			key: 'eventos',
 			label: 'Eventos',
 			claims: [...claimEventosCompleto],
+		},
+		{
+			id: 'feat-local-troca',
+			key: 'local-troca',
+			label: 'Local de troca',
+			claims: [...claimLocalTrocaCompleto],
+		},
+		{
+			id: 'feat-relatorios-eventos',
+			key: 'relatorios-eventos',
+			label: 'Relatórios',
+			claims: [{ id: 'rev1', value: 'relatorios-eventos.view', label: 'Visualizar' }],
 		},
 	],
 };
@@ -127,6 +146,18 @@ const funcionalidadesGestor: GrupoFuncionalidade[] = [
 				label: 'Eventos',
 				claims: [...claimEventosCompleto],
 			},
+			{
+				id: 'feat-local-troca',
+				key: 'local-troca',
+				label: 'Local de troca',
+				claims: [...claimLocalTrocaCompleto],
+			},
+			{
+				id: 'feat-relatorios-eventos',
+				key: 'relatorios-eventos',
+				label: 'Relatórios',
+				claims: [{ id: 'rev1', value: 'relatorios-eventos.view', label: 'Visualizar' }],
+			},
 		],
 	},
 	{
@@ -175,6 +206,22 @@ const funcionalidadesOperador: GrupoFuncionalidade[] = [
 					{ id: 'e2', value: 'eventos.create', label: 'Cadastrar' },
 					{ id: 'e3', value: 'eventos.edit', label: 'Editar' },
 				],
+			},
+			{
+				id: 'feat-local-troca',
+				key: 'local-troca',
+				label: 'Local de troca',
+				claims: [
+					{ id: 'lt1', value: 'local-troca.view', label: 'Visualizar' },
+					{ id: 'lt2', value: 'local-troca.create', label: 'Cadastrar' },
+					{ id: 'lt3', value: 'local-troca.edit', label: 'Editar' },
+				],
+			},
+			{
+				id: 'feat-relatorios-eventos',
+				key: 'relatorios-eventos',
+				label: 'Relatórios',
+				claims: [{ id: 'rev1', value: 'relatorios-eventos.view', label: 'Visualizar' }],
 			},
 		],
 	},

@@ -1,6 +1,7 @@
 import { api, apiPublic, apiPublicSilent, apiSilent } from '@/lib/api';
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { aplicarRespostaMockada } from './resposta-mock-axios';
+import { registrarMocksApiEventos } from './eventos-mock-api';
 import { registrarMocksApiSeguranca } from './seguranca-mock-api';
 import { MOCK_PASSWORD, MOCK_USERS } from './users';
 
@@ -9,6 +10,7 @@ import { MOCK_PASSWORD, MOCK_USERS } from './users';
  *
  * - Login: `apiPublic` e `apiPublicSilent` (AuthService usa silent).
  * - Segurança e endereço: `api` e `apiSilent` (ex.: `EnderecoService` usa silent).
+ * - Eventos (Parte 2): `api` e `apiSilent`.
  *
  * Ativado por: VITE_MOCK_API=true (ou 1 / yes)
  */
@@ -36,4 +38,5 @@ export function enableMocks() {
 	registrarMockLogin(apiPublic);
 	registrarMockLogin(apiPublicSilent);
 	registrarMocksApiSeguranca(api, apiSilent);
+	registrarMocksApiEventos(api, apiSilent);
 }

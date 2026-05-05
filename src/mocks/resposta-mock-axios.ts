@@ -11,7 +11,7 @@ export function aplicarRespostaMockada(
 		await new Promise((resolve) => setTimeout(resolve, 120 + Math.random() * 180));
 
 		try {
-			const data = handler();
+			const data = await Promise.resolve(handler());
 
 			return {
 				data,

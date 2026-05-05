@@ -28,11 +28,11 @@ export function ModalVisualizadorAnexo({
 
 	useEffect(() => {
 		if (!aberto || !anexo) {
-			setUrlObjeto(null);
+			queueMicrotask(() => setUrlObjeto(null));
 			return;
 		}
 		const url = criarUrlParaVisualizacao(anexo);
-		setUrlObjeto(url);
+		queueMicrotask(() => setUrlObjeto(url));
 		return () => {
 			if (url?.startsWith('blob:')) URL.revokeObjectURL(url);
 		};

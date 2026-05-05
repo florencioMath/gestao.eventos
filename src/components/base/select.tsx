@@ -23,16 +23,21 @@ export const Select = ({
 	options,
 	groups,
 	placeholder = 'Selecione...',
+	triggerId,
+	triggerClassName,
 	...props
 }: React.ComponentProps<typeof SelectBase> & {
 	options?: SelectOption[];
 	groups?: SelectGroupOption[];
 	placeholder?: string;
+	/** Repassado ao gatilho visível (ex.: `htmlFor` do `Label`). */
+	triggerId?: string;
+	triggerClassName?: string;
 }) => {
 	if (groups && groups.length > 0) {
 		return (
 			<SelectBase {...props}>
-				<SelectTrigger>
+				<SelectTrigger id={triggerId} className={triggerClassName}>
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
 				<SelectContent>
@@ -57,7 +62,7 @@ export const Select = ({
 	if (options && options.length > 0) {
 		return (
 			<SelectBase {...props}>
-				<SelectTrigger>
+				<SelectTrigger id={triggerId} className={triggerClassName}>
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
 				<SelectContent>

@@ -299,7 +299,7 @@ export const SignInPage = () => {
 			<div className='w-full max-w-md'>
 				<div className='flex justify-center mb-8'>
 					<img
-						src='/logo-ici.png'
+						src='/logo-osasco.png'
 						alt='ICI'
 						className='h-16 w-auto max-w-[200px] object-contain'
 					/>

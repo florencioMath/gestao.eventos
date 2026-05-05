@@ -10,24 +10,27 @@ import {
 	SidebarMenuSubItem,
 } from '@/components/base/sidebar';
 import { CONFIG } from '@/config';
-import { resolveFeaturePath } from '@/config/feature-routes';
+import { menuLateralItemAtivo, resolveFeaturePath } from '@/config/feature-routes';
 import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 import {
 	Blocks,
 	CalendarDays,
 	ChevronDown,
+	FileSpreadsheet,
 	Folder,
 	LayoutDashboard,
 	ListTodo,
 	LogOut,
+	MapPin,
 	Settings,
 	Shield,
 	User,
 	Users,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { NavLink } from './navlink';
+import { Link, useLocation } from 'react-router-dom';
 
 const ICONES_POR_GRUPO: Record<string, LucideIcon> = {
 	Eventos: CalendarDays,
@@ -37,6 +40,8 @@ const ICONES_POR_GRUPO: Record<string, LucideIcon> = {
 const ICONES_POR_FEATURE: Record<string, LucideIcon> = {
 	painel: LayoutDashboard,
 	eventos: ListTodo,
+	'local-troca': MapPin,
+	'relatorios-eventos': FileSpreadsheet,
 	'cadastro-usuario': Users,
 	'perfil-acesso': User,
 	funcionalidades: Settings,
@@ -58,6 +63,7 @@ interface NavGroup {
 
 export function Navbar() {
 	const { user, logout } = useAuth();
+	const { pathname } = useLocation();
 
 	const userClaims = new Set(user?.claims ?? []);
 
@@ -113,7 +119,7 @@ export function Navbar() {
 			<div className='flex items-center gap-3 px-4 py-5 border-b border-sidebar-border'>
 				<div className='flex flex-col'>
 					<span className='text-sm font-semibold text'>{CONFIG.PROJECT_LABEL}</span>
-					<span className='text-xs text/60'>Sistema de gestão</span>
+					<span className='text-xs text/60'>{CONFIG.PROJECT_TAGLINE}</span>
 				</div>
 			</div>
 
@@ -141,19 +147,27 @@ export function Navbar() {
 
 								{isOpen && (
 									<SidebarMenuSub>
-										{grupo.features.map((feature) => (
-											<SidebarMenuSubItem key={feature.id}>
-												<SidebarMenuSubButton asChild>
-													<NavLink
-														to={feature.path}
-														className='flex items-center px-2 py-1.5 text-sm text-sidebar-foreground/70 rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-														activeClassName='text-sidebar-accent-foreground font-medium'>
-														<feature.icon className='h-4 w-4 shrink-0' />
-														<span>{feature.label}</span>
-													</NavLink>
-												</SidebarMenuSubButton>
-											</SidebarMenuSubItem>
-										))}
+										{grupo.features.map((feature) => {
+											const ativo = menuLateralItemAtivo(pathname, feature.path);
+											return (
+												<SidebarMenuSubItem key={feature.id}>
+													<SidebarMenuSubButton asChild isActive={ativo}>
+														<Link
+															to={feature.path}
+															aria-current={ativo ? 'page' : undefined}
+															className={cn(
+																'flex items-center px-2 py-1.5 text-sm rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+																ativo
+																	? 'text-sidebar-accent-foreground font-medium'
+																	: 'text-sidebar-foreground/70'
+															)}>
+															<feature.icon className='h-4 w-4 shrink-0' />
+															<span>{feature.label}</span>
+														</Link>
+													</SidebarMenuSubButton>
+												</SidebarMenuSubItem>
+											);
+										})}
 									</SidebarMenuSub>
 								)}
 							</SidebarMenuItem>
