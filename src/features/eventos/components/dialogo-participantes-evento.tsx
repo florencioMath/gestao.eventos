@@ -12,8 +12,14 @@ import { Label } from "@/components/base/label";
 import { Tooltip } from "@/components/base/tooltip";
 import { Can } from "@/components/can";
 import { ParticipantesApi } from "@/features/eventos/api/eventos-api";
+import { IngressosApi } from "@/features/eventos/api/ingressos-api";
 import { formatarDataHoraPortugues24 } from "@/features/eventos/lib/datas-evento";
-import type { EventoCadastroDto, EventoLoteIngressoPayload, ParticipanteDto } from "@/features/eventos/types";
+import type {
+	EventoCadastroDto,
+	EventoLoteIngressoPayload,
+	IngressoQrResolverDto,
+	ParticipanteDto,
+} from "@/features/eventos/types";
 import { useAuth } from "@/hooks/use-auth";
 import { cn, maskCPF, maskPhone, onlyDigits } from "@/lib/utils";
 import {
@@ -25,6 +31,7 @@ import {
 	Plus,
 	RotateCcw,
 	RotateCw,
+	QrCode,
 	Ticket,
 	UserCircle,
 	UserMinus,
@@ -32,6 +39,10 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { DialogoConfirmarRetirada } from "./dialogo-confirmar-retirada";
+import {
+	DialogoFluxoRetiradaQrIngresso,
+	type ResultadoProcessarLeituraQr,
+} from "./dialogo-fluxo-retirada-qr-ingresso";
 import { DialogoDetalhesParticipante } from "./dialogo-detalhes-participante";
 
 type Props = {
@@ -120,6 +131,8 @@ export function DialogoParticipantesEvento({ aberto, onAbertoChange, evento, onE
 	} | null>(null);
 
 	const [acaoConfirmacao, setAcaoConfirmacao] = useState<AcaoConfirmacao | null>(null);
+
+	const [fluxoQrAberto, setFluxoQrAberto] = useState(false);
 
 	useEffect(() => {
 		clearTimeout(debounceRef.current);
@@ -234,6 +247,39 @@ export function DialogoParticipantesEvento({ aberto, onAbertoChange, evento, onE
 		await recarregar();
 		onEventoAtualizado?.();
 	};
+
+	const processarLeituraQrParticipantes = useCallback(
+		async (payloadBruto: string): Promise<ResultadoProcessarLeituraQr> => {
+			if (!evento) return { ok: false };
+			try {
+				const dto = await IngressosApi.validarLeitura(payloadBruto);
+				if (dto.cdEventosCadastro !== evento.cdEventosCadastro) {
+					toast.error("Este ingresso não pertence a este evento.");
+					return { ok: false };
+				}
+				return { ok: true, dto, evento };
+			} catch {
+				return { ok: false };
+			}
+		},
+		[evento]
+	);
+
+	const confirmarRetiradaQrParticipantes = useCallback(
+		async (dto: IngressoQrResolverDto, cdLocal?: string) => {
+			if (!dto.podeConfirmarRetirada) return;
+			try {
+				await IngressosApi.confirmarRetirada(dto.cdIngresso, {
+					cdLocalRetirada: cdLocal,
+					nomeOperadorRetirada: user?.name,
+				});
+			} catch {
+				toast.error("Não foi possível confirmar a retirada.");
+				throw new Error("confirmar");
+			}
+		},
+		[user]
+	);
 
 	const executarRetiradaDireta = async (p: ParticipanteDto) => {
 		const pontos = evento?.semPontoDeTroca ? [] : (evento?.pontosDeTrocaCodigos ?? []);
@@ -505,6 +551,19 @@ export function DialogoParticipantesEvento({ aberto, onAbertoChange, evento, onE
 						</div>
 
 						<div className='mb-4 flex flex-wrap items-end gap-4'>
+							<Can claim='eventos.edit'>
+								<div className='flex flex-col gap-2'>
+									<span className='text-sm font-medium leading-none'>QR Code</span>
+									<Button
+										type='button'
+										variant='secondary'
+										className='gap-2'
+										onClick={() => setFluxoQrAberto(true)}>
+										<QrCode className='h-4 w-4' aria-hidden />
+										Ler QR
+									</Button>
+								</div>
+							</Can>
 							<div className='grid min-w-[min(100%,12rem)] flex-1 gap-2'>
 								<Label htmlFor='filtro-part-nome'>Nome</Label>
 								<Input
@@ -748,6 +807,15 @@ export function DialogoParticipantesEvento({ aberto, onAbertoChange, evento, onE
 				participante={confirmarPara}
 				onConfirmar={handleConfirmarDialogo}
 				gravando={gravandoConfirmar}
+			/>
+
+			<DialogoFluxoRetiradaQrIngresso
+				aberto={fluxoQrAberto}
+				onAbertoChange={setFluxoQrAberto}
+				processarLeitura={processarLeituraQrParticipantes}
+				onConfirmarRetirada={confirmarRetiradaQrParticipantes}
+				aposConfirmarSucesso={aposMutacao}
+				tituloLeitura='Ler QR Code do ingresso'
 			/>
 
 			<DialogoDetalhesParticipante

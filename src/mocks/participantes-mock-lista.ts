@@ -3,6 +3,20 @@
  * IDs estáveis para o mock mutável do interceptor.
  */
 
+/** Um ingresso com token para QR Code (mock Gestão / Portal). */
+export type IngressoMockItem = {
+	cdIngresso: string;
+	cdEventosReservas: string;
+	/** Texto exacto a codificar no QR (PNG gerado fora do repo). */
+	tokenQr: string;
+	ordem: number;
+	retirado: boolean;
+	dataRetirada?: string;
+	cdLocalRetirada?: string;
+	nomeLocalRetirada?: string;
+	nomeOperadorRetirada?: string;
+};
+
 export type ReservaMockItem = {
 	cdEventosReservas: string;
 	cdEventosCadastro: string;
@@ -17,6 +31,8 @@ export type ReservaMockItem = {
 	nomeOperadorRetirada?: string;
 	dataCriacao: string;
 	dataCancelamento?: string;
+	/** Opcional: ingressos por reserva (ex.: Cidadão — tokens QR). */
+	ingressos?: IngressoMockItem[];
 };
 
 export type ParticipanteMockListaItem = {
@@ -97,7 +113,10 @@ export const MOCK_PARTICIPANTES_LISTA: ParticipanteMockListaItem[] = [
 			},
 		],
 	},
-	/** Mesmo CPF/dados do `DADOS_PERFIL_MOCK` do portal — presente em todos os shows exceto Oz Festival 2026 (cadastro manual no portal para testes). */
+	/**
+	 * Mesmo CPF/dados do `DADOS_PERFIL_MOCK` do portal.
+	 * Oz Festival 2026: 2 ingressos + tokens QR · Show Ana Castela: 1 ingresso + token QR.
+	 */
 	{
 		cdParticipante: "f58e9e7b-756b-461a-b6f1-e576ea8f74b0",
 		nome: "Cidadão",
@@ -106,6 +125,31 @@ export const MOCK_PARTICIPANTES_LISTA: ParticipanteMockListaItem[] = [
 		telefone: "41997489304",
 		reservas: [
 			{
+				cdEventosReservas: "res-cidadao-oz-2026",
+				cdEventosCadastro: "evt-oz-2026",
+				cdLoteIngresso: "0",
+				quantidadeIngressos: 2,
+				statusReserva: "ATIVA",
+				presencaConfirmada: false,
+				dataCriacao: "2026-04-25T10:00:00.000Z",
+				ingressos: [
+					{
+						cdIngresso: "ing-cid-oz-1",
+						cdEventosReservas: "res-cidadao-oz-2026",
+						tokenQr: "QRMOCK-CIDADAO-OZ-1",
+						ordem: 1,
+						retirado: false,
+					},
+					{
+						cdIngresso: "ing-cid-oz-2",
+						cdEventosReservas: "res-cidadao-oz-2026",
+						tokenQr: "QRMOCK-CIDADAO-OZ-2",
+						ordem: 2,
+						retirado: false,
+					},
+				],
+			},
+			{
 				cdEventosReservas: "res-cidadao-ana-pendente",
 				cdEventosCadastro: "evt-ana-castela",
 				cdLoteIngresso: "0",
@@ -113,6 +157,15 @@ export const MOCK_PARTICIPANTES_LISTA: ParticipanteMockListaItem[] = [
 				statusReserva: "ATIVA",
 				presencaConfirmada: false,
 				dataCriacao: "2026-04-20T10:00:00.000Z",
+				ingressos: [
+					{
+						cdIngresso: "ing-cid-ana-1",
+						cdEventosReservas: "res-cidadao-ana-pendente",
+						tokenQr: "QRMOCK-CIDADAO-ANA-1",
+						ordem: 1,
+						retirado: false,
+					},
+				],
 			},
 			{
 				cdEventosReservas: "res-cidadao-wesley-cancel",

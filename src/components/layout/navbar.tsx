@@ -11,6 +11,7 @@ import {
 } from '@/components/base/sidebar';
 import { CONFIG } from '@/config';
 import { menuLateralItemAtivo, resolveFeaturePath } from '@/config/feature-routes';
+import { FluxoRetiradaQrIngresso } from '@/features/eventos/components/fluxo-retirada-qr-ingresso';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
@@ -65,14 +66,15 @@ export function Navbar() {
 	const { user, logout } = useAuth();
 	const { pathname } = useLocation();
 
-	const userClaims = new Set(user?.claims ?? []);
-
 	const grupos: NavGroup[] = useMemo(() => {
+		const userClaims = new Set(user?.claims ?? []);
 		return (user?.funcionalidades ?? [])
 			.map((grupo) => {
 				const features: NavFeature[] = [];
 
 				for (const feature of grupo.features) {
+					if (feature.key === 'leitor-qr') continue;
+
 					const hasView = feature.claims.some(
 						(c) => c.value.endsWith('.view') && userClaims.has(c.value)
 					);
@@ -92,7 +94,7 @@ export function Navbar() {
 				return { id: grupo.id, nome: grupo.nome, features };
 			})
 			.filter((g) => g.features.length > 0);
-	}, [user?.funcionalidades, userClaims]);
+	}, [user?.funcionalidades, user?.claims]);
 
 	const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
 		const firstId = (user?.funcionalidades ?? []).find((g) =>
@@ -177,6 +179,7 @@ export function Navbar() {
 			</SidebarContent>
 
 			<SidebarFooter className='border-t border-sidebar-border p-4'>
+				<FluxoRetiradaQrIngresso />
 				<div className='flex items-center gap-3 mb-3'>
 					<div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold'>
 						{user?.name.charAt(0)}

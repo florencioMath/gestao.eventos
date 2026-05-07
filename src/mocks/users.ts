@@ -90,6 +90,12 @@ const grupoEventosAdmin: GrupoFuncionalidade = {
 			label: 'Relatórios',
 			claims: [{ id: 'rev1', value: 'relatorios-eventos.view', label: 'Visualizar' }],
 		},
+		{
+			id: 'feat-leitor-qr',
+			key: 'leitor-qr',
+			label: 'Leitor QR',
+			claims: [{ id: 'lqr1', value: 'leitor-qr.view', label: 'Visualizar' }],
+		},
 	],
 };
 
@@ -158,6 +164,12 @@ const funcionalidadesGestor: GrupoFuncionalidade[] = [
 				label: 'Relatórios',
 				claims: [{ id: 'rev1', value: 'relatorios-eventos.view', label: 'Visualizar' }],
 			},
+			{
+				id: 'feat-leitor-qr',
+				key: 'leitor-qr',
+				label: 'Leitor QR',
+				claims: [{ id: 'lqr1', value: 'leitor-qr.view', label: 'Visualizar' }],
+			},
 		],
 	},
 	{
@@ -222,6 +234,12 @@ const funcionalidadesOperador: GrupoFuncionalidade[] = [
 				key: 'relatorios-eventos',
 				label: 'Relatórios',
 				claims: [{ id: 'rev1', value: 'relatorios-eventos.view', label: 'Visualizar' }],
+			},
+			{
+				id: 'feat-leitor-qr',
+				key: 'leitor-qr',
+				label: 'Leitor QR',
+				claims: [{ id: 'lqr1', value: 'leitor-qr.view', label: 'Visualizar' }],
 			},
 		],
 	},

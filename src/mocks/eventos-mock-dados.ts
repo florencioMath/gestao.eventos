@@ -1,7 +1,11 @@
 import type { EventoAnexoDto, EventoCadastroDto, EventoDominioOpcaoDto } from "@/features/eventos/types";
 import { enriquecerEventoComProgramacao } from "./eventos-mock-helpers";
 import { MOCK_EVENTOS_LISTA, type EventoMockListaItem } from "./eventos-mock-lista";
-import { MOCK_PARTICIPANTES_LISTA, type ParticipanteMockListaItem } from "./participantes-mock-lista";
+import {
+	MOCK_PARTICIPANTES_LISTA,
+	type IngressoMockItem,
+	type ParticipanteMockListaItem,
+} from "./participantes-mock-lista";
 
 /** @deprecated Use {@link EventoMockListaItem} — mantido para imports antigos. */
 export type EventoMockComAnexos = EventoMockListaItem;
@@ -43,11 +47,27 @@ export function clonarParticipantesIniciais(): ParticipanteMockListaItem[] {
 		...p,
 		documento: String(p.documento).replace(/\D/g, "") || p.documento,
 		telefone: String(p.telefone).replace(/\D/g, "") || p.telefone,
-		reservas: p.reservas.map((r) => ({ ...r })),
+		reservas: p.reservas.map((r) => ({
+			...r,
+			ingressos: r.ingressos?.map((ing) => ({ ...ing })),
+		})),
 	}));
+}
+
+/** Lista achatada de ingressos (tokens QR) a partir das reservas em `MOCK_PARTICIPANTES_LISTA`. */
+export function clonarIngressosIniciais(): IngressoMockItem[] {
+	const out: IngressoMockItem[] = [];
+	for (const p of MOCK_PARTICIPANTES_LISTA) {
+		for (const r of p.reservas) {
+			for (const ing of r.ingressos ?? []) {
+				out.push({ ...ing });
+			}
+		}
+	}
+	return out;
 }
 
 export type { EventoMockListaItem } from "./eventos-mock-lista";
 export { MOCK_EVENTOS_LISTA } from "./eventos-mock-lista";
-export type { ParticipanteMockListaItem, ReservaMockItem } from "./participantes-mock-lista";
+export type { IngressoMockItem, ParticipanteMockListaItem, ReservaMockItem } from "./participantes-mock-lista";
 export { MOCK_PARTICIPANTES_LISTA } from "./participantes-mock-lista";

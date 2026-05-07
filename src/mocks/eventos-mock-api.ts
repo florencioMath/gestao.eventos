@@ -20,6 +20,7 @@ import {
 	MOCK_DOMINIO_LOCAIS,
 	clonarEventosIniciais,
 	clonarImagensIniciaisPorEvento,
+	clonarIngressosIniciais,
 	clonarParticipantesIniciais,
 } from "./eventos-mock-dados.ts";
 import {
@@ -32,6 +33,14 @@ import {
 	somaIngressosAtivosNoEvento,
 	somaIngressosReservadosNoLote,
 } from "./participantes-mock-helpers.ts";
+import {
+	desmarcarIngressosAoDesfazerReserva,
+	dtoParticipanteParaNomeDoc,
+	encontrarIngressoPorTokenQr,
+	marcarTodosIngressosRetiradosParaReserva,
+	montarResolverIngressoQr,
+	sincronizarReservaAPartirDosIngressos,
+} from "./ingressos-mock-helpers.ts";
 import type { ParticipanteMockListaItem } from "./participantes-mock-lista.ts";
 import { aplicarRespostaMockada } from "./resposta-mock-axios.ts";
 
@@ -50,7 +59,7 @@ function pathNormalizado(config: InternalAxiosRequestConfig): string {
 			/* mantém */
 		}
 	}
-	const marcas = ["/eventos", "/imagens", "/participantes", "/relatorios", "/locais-troca"];
+	const marcas = ["/eventos", "/imagens", "/ingressos", "/participantes", "/relatorios", "/locais-troca"];
 	for (const m of marcas) {
 		const i = p.indexOf(m);
 		if (i >= 0) return p.slice(i);
@@ -82,7 +91,10 @@ let locaisTroca: LocalTrocaDto[] = [
 const imagensPorEvento = clonarImagensIniciaisPorEvento();
 
 /** Estado mutável participant-centric (reservas por pessoa). */
-let participantes: ParticipanteMockListaItem[] = clonarParticipantesIniciais();
+const participantes: ParticipanteMockListaItem[] = clonarParticipantesIniciais();
+
+/** Ingressos individuais (mock QR por ingresso). */
+const ingressos = clonarIngressosIniciais();
 
 function reconciliarContadoresEventos(): void {
 	for (let i = 0; i < eventos.length; i++) {
@@ -501,6 +513,72 @@ function tratar(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig 
 		});
 	}
 
+	if (metodo === "post" && path === "/ingressos/validar-leitura") {
+		return aplicarRespostaMockada(config, () => {
+			const body = (typeof config.data === "string" ? JSON.parse(config.data) : config.data) as {
+				payloadQr?: string;
+			};
+			const payloadQr = String(body.payloadQr ?? "").trim();
+			if (!payloadQr) throw { status: 400, message: "payloadQr obrigatório." };
+			const ing = encontrarIngressoPorTokenQr(ingressos, payloadQr);
+			if (!ing) throw { status: 404, message: "QR não reconhecido." };
+			const hit = encontrarReservaPorParticipanteId(participantes, ing.cdEventosReservas);
+			if (!hit) throw { status: 404, message: "Reserva não encontrada." };
+			const ev = obterEventoPorId(hit.reserva.cdEventosCadastro);
+			if (!ev) throw { status: 404, message: "Evento não encontrado." };
+			const { nome, documento } = dtoParticipanteParaNomeDoc(participantes, ing.cdEventosReservas);
+			return montarResolverIngressoQr({
+				ingresso: ing,
+				participantes,
+				evento: ev,
+				quantidadeIngressosReserva: hit.reserva.quantidadeIngressos,
+				nomeParticipante: nome,
+				documentoParticipante: documento,
+			});
+		});
+	}
+
+	const mIngRet = path.match(/^\/ingressos\/([^/]+)\/retirada$/);
+	if (metodo === "patch" && mIngRet) {
+		const cdIngresso = mIngRet[1]!;
+		return aplicarRespostaMockada(config, () => {
+			const body = (typeof config.data === "string" ? JSON.parse(config.data) : config.data) as {
+				cdLocalRetirada?: string;
+				nomeOperadorRetirada?: string;
+			};
+			const ing = ingressos.find((x) => x.cdIngresso === cdIngresso);
+			if (!ing) throw { status: 404, message: "Ingresso não encontrado." };
+			const hit = encontrarReservaPorParticipanteId(participantes, ing.cdEventosReservas);
+			if (!hit) throw { status: 404, message: "Reserva não encontrada." };
+			const { reserva } = hit;
+			const ev = obterEventoPorId(reserva.cdEventosCadastro);
+			if (!ev) throw { status: 404, message: "Evento não encontrado." };
+			if (reserva.statusReserva !== "ATIVA") {
+				throw { status: 400, message: "Reserva não está ativa." };
+			}
+			if (ing.retirado) throw { status: 400, message: "Ingresso já retirado." };
+			const pontos = ev.pontosDeTrocaCodigos ?? [];
+			let cdLocal = body.cdLocalRetirada?.trim();
+			if (!ev.semPontoDeTroca && pontos.length > 0) {
+				if (pontos.length === 1) cdLocal = pontos[0]!.id;
+				if (!cdLocal || !pontos.some((p) => p.id === cdLocal)) {
+					throw { status: 400, message: "Ponto de troca inválido ou obrigatório." };
+				}
+				ing.cdLocalRetirada = cdLocal;
+				ing.nomeLocalRetirada = nomeLocalPorId(pontos, cdLocal) ?? pontos.find((p) => p.id === cdLocal)?.nome;
+			} else {
+				ing.cdLocalRetirada = cdLocal;
+				ing.nomeLocalRetirada = cdLocal ? nomeLocalPorId(pontos, cdLocal) : undefined;
+			}
+			ing.retirado = true;
+			ing.dataRetirada = agoraIso();
+			ing.nomeOperadorRetirada = body.nomeOperadorRetirada?.trim() || undefined;
+			sincronizarReservaAPartirDosIngressos(participantes, ingressos, ing.cdEventosReservas, agoraIso);
+			reconciliarContadoresEventos();
+			return {};
+		});
+	}
+
 	const mPartDoc = path.match(/^\/participantes\/documento\/([^/]+)$/);
 	if (metodo === "get" && mPartDoc) {
 		const docRaw = decodeURIComponent(mPartDoc[1] ?? "");
@@ -568,12 +646,23 @@ function tratar(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig 
 				reserva.presencaConfirmada = true;
 				reserva.dataRetirada = agoraIso();
 				reserva.nomeOperadorRetirada = body.nomeOperadorRetirada?.trim() || undefined;
+				marcarTodosIngressosRetiradosParaReserva(
+					ingressos,
+					reserva.cdEventosReservas,
+					{
+						cdLocalRetirada: reserva.cdLocalRetirada,
+						nomeLocalRetirada: reserva.nomeLocalRetirada,
+						nomeOperadorRetirada: reserva.nomeOperadorRetirada,
+					},
+					agoraIso
+				);
 			} else {
 				reserva.presencaConfirmada = false;
 				reserva.dataRetirada = undefined;
 				reserva.cdLocalRetirada = undefined;
 				reserva.nomeLocalRetirada = undefined;
 				reserva.nomeOperadorRetirada = undefined;
+				desmarcarIngressosAoDesfazerReserva(ingressos, reserva.cdEventosReservas);
 			}
 			return {};
 		});

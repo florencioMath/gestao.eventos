@@ -203,6 +203,31 @@ export type ParticipanteHistoricoEventoDto = {
 	nomeLocalRetirada?: string;
 };
 
+/** Corpo `POST /ingressos/validar-leitura` — texto bruto lido do QR (ou URL acordada com o Portal). */
+export type ValidarLeituraQrPayload = {
+	payloadQr: string;
+};
+
+/**
+ * Resposta ao validar o QR no Gestão antes de confirmar retirada por ingresso.
+ * Contrato alinhado ao Portal (um token por ingresso).
+ */
+export type IngressoQrResolverDto = {
+	cdIngresso: string;
+	/** Mesmo identificador usado na lista de participantes (`cdEventosReservas` da reserva). */
+	cdEventosParticipantes: string;
+	cdEventosReservas: string;
+	cdEventosCadastro: string;
+	nomeEvento: string;
+	nomeParticipante: string;
+	documentoParticipante: string;
+	/** Posição do ingresso na reserva (1-based). */
+	ordemIngresso: number;
+	quantidadeIngressosReserva: number;
+	podeConfirmarRetirada: boolean;
+	motivoBloqueio?: string;
+};
+
 /** Item de relatório gerado (listagem administrativa). */
 export type RelatorioGeradoDto = {
 	id: string;
