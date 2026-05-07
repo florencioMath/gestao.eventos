@@ -36,6 +36,8 @@
 		"@tiptap/pm": "^3.22.5",
 		"@tiptap/react": "^3.22.5",
 		"@tiptap/starter-kit": "^3.22.5",
+		"@zxing/browser": "^0.1.5",
+		"@zxing/library": "^0.21.3",
 		"axios": "^1.13.2",
 		"chart.js": "^4.5.1",
 		"chartjs-plugin-datalabels": "^2.2.0",
